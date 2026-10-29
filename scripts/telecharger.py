@@ -168,7 +168,13 @@ def ws_api(**params):
 def ws_trouver(ligne):
     """Renvoie (titre de page, statut)."""
     if ligne["wikisource"]:
-        d = ws_api(action="query", titles=ligne["wikisource"], redirects=1, prop="pageprops")
+        try:
+            d = ws_api(action="query", titles=ligne["wikisource"], redirects=1, prop="pageprops")
+        except HTTPError as e:
+            if e.code != 429:
+                raise
+            # API Wikisource saturée : on fait confiance au titre indiqué dans le catalogue
+            return ligne["wikisource"], "ok"
         p = d["query"]["pages"][0]
         if not p.get("missing"):
             if "disambiguation" in p.get("pageprops", {}):
@@ -197,14 +203,15 @@ def epub_valide(donnees):
 
 
 def telecharger(url):
-    for essai in range(3):
+    for essai in range(5):
         try:
             return requete(url)
         except (HTTPError, URLError, TimeoutError) as e:
-            if essai == 2:
+            if essai == 4:
                 raise
-            print(f"      nouvelle tentative ({e})")
-            time.sleep(10)
+            attente = 60 * (essai + 1) if getattr(e, "code", None) == 429 else 10
+            print(f"      nouvelle tentative dans {attente} s ({e})")
+            time.sleep(attente)
 
 
 def resoudre(ligne, args):

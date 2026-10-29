@@ -1,9 +1,9 @@
 name: Applications de bureau (release)
 
 # Crée une release GitHub avec l'application pour macOS, Windows et Linux.
-# Pour publier une nouvelle version : changer « version » dans electron/package.json,
-# puis pousser une étiquette du même numéro, par exemple :
-#   git tag v1.0.1 && git push origin v1.0.1
+# Pour publier une nouvelle version : changer « version » dans electron/package.json et pousser,
+# puis soit lancer cette action à la main (onglet Actions › « Run workflow »),
+# soit pousser une étiquette du même numéro : git tag v1.0.1 && git push origin v1.0.1
 on:
   push:
     tags: ["v*"]
@@ -33,12 +33,16 @@ jobs:
           path: site
           include-hidden-files: true
       - name: Créer la release (les trois systèmes y ajouteront leurs fichiers)
-        if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" \
-            --title "Bac de français ${GITHUB_REF_NAME}" \
+          TAG="v$(node -p "require('./electron/package.json').version")"
+          if [[ "$GITHUB_REF" == refs/tags/* && "$GITHUB_REF_NAME" != "$TAG" ]]; then
+            echo "L'étiquette $GITHUB_REF_NAME ne correspond pas à la version $TAG de electron/package.json" >&2
+            exit 1
+          fi
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --target "$GITHUB_SHA" \
+            --title "Bac de français $TAG" \
             --notes-file .github/notes-release.md
 
   application:
@@ -71,14 +75,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
-        run: npx electron-builder ${{ matrix.cible }} --publish ${{ startsWith(github.ref, 'refs/tags/') && 'always' || 'never' }}
-      - name: Garder les fichiers (lancement manuel)
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: application-${{ matrix.nom }}
-          path: |
-            electron/dist/*.dmg
-            electron/dist/*.exe
-            electron/dist/*.AppImage
-            electron/dist/*.deb
+        run: npx electron-builder ${{ matrix.cible }} --publish always

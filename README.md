@@ -95,13 +95,10 @@ ordinateur » (cliquer sur *Informations complémentaires › Exécuter quand m�
 demander une confirmation dans *Réglages Système › Confidentialité et sécurité › Ouvrir quand même*.
 
 **Publier une nouvelle version** (par exemple après la mise à jour du programme) : changer
-`version` dans `electron/package.json`, pousser, puis pousser une étiquette du même numéro :
-
-```bash
-git tag v1.1.0 && git push origin v1.1.0
-```
-
-L'action « Applications de bureau » construit les trois versions et les ajoute à la release.
+`version` dans `electron/package.json` et pousser, puis lancer l'action « Applications de bureau
+(release) » depuis l'onglet **Actions** (*Run workflow*). On peut aussi pousser une étiquette du
+même numéro (`git tag v1.1.0 && git push origin v1.1.0`). L'action crée la release `v1.1.0`,
+construit les trois versions et les y ajoute.
 
 Tester l'application en local : `python3 scripts/construire.py && mv site electron/site`,
 puis `cd electron && npm install && npm start`.

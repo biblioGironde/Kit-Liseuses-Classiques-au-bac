@@ -1,5 +1,7 @@
 # Kit Bac de français — classiques libres
 
+![La webapp « Bac de français » : bouton pour voir les 34 livres, puis étape « Branchez la liseuse à l'ordinateur »](docs/capture.png)
+
 Les œuvres **libres de droits** inscrites au programme de première pour les épreuves
 anticipées de français de **2020 à 2027**, et une webapp pour les copier en quelques
 clics sur les liseuses du réseau (Kobo, Cybook…).

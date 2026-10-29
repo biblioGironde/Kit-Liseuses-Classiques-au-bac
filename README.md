@@ -4,7 +4,7 @@ Les œuvres **libres de droits** inscrites au programme de première pour les é
 anticipées de français de **2020 à 2027**, et une webapp pour les copier en quelques
 clics sur les liseuses du réseau (Kobo, Cybook…).
 
-**Webapp :** https://bibliogironde.github.io/Kit-Bac-Francais-Classiques/
+**Webapp :** https://bibliogironde.github.io/Kit-Liseuses-Classiques-au-bac/
 
 Ce dépôt complète le [Kit Les Classiques en numérique](https://github.com/biblioGironde/Kit-Les-Classiques-En-Numerique)
 et en reprend le fonctionnement.

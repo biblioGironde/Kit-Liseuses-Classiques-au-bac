@@ -36,7 +36,7 @@ from commun import chemin_epub, ecrire_catalogue, lire_catalogue, sans_accents
 BNR = "https://ebooks-bnr.com/"
 API_WS = "https://fr.wikisource.org/w/api.php"
 WSEXPORT = "https://ws-export.wmcloud.org/"
-UA = "Kit-Bac-Francais-Classiques/1.0 (biblio.gironde ; https://github.com/biblioGironde/Kit-Bac-Francais-Classiques)"
+UA = "Kit-Liseuses-Classiques-au-bac/1.0 (biblio.gironde ; https://github.com/biblioGironde/Kit-Liseuses-Classiques-au-bac)"
 TAILLE_MIN = 15_000   # en dessous : probablement une page d'homonymie ou un sommaire vide
 PAUSE = 3             # secondes entre deux téléchargements, par politesse envers les sites
 

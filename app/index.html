@@ -152,6 +152,8 @@
   .cat-pied { padding: 14px 26px; border-top: 1px solid var(--ligne); text-align: right; }
   .actions-etape1 { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .actions-etape1 .bouton { min-height: 60px; font-size: 18px; padding: 0 22px; }
+  .voir-livres-haut { margin: -4px 0 22px; padding-bottom: 20px; border-bottom: 1px solid var(--ligne); }
+  .voir-livres-haut .bouton { min-height: 60px; font-size: 18px; padding: 0 22px; width: 100%; }
   dialog#modalNavigateur.secours { display: block; position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 100; margin: 0; }
   .voile { position: fixed; inset: 0; background: rgba(31,42,55,.55); z-index: 99; }
   .modal-ico { width: 56px; height: 56px; border-radius: 50%; background: var(--alerte); border: 3px solid var(--alerte-bord);
@@ -246,6 +248,9 @@
 
   <!-- Étape 1 -->
   <section id="etape1" class="carte">
+    <div class="voir-livres-haut">
+      <button class="bouton btnVoirLivres" type="button">📚 Voir les livres disponibles</button>
+    </div>
     <h2>Branchez la liseuse à l'ordinateur</h2>
     <p class="intro">Allumez la liseuse, puis reliez-la à l'ordinateur avec son câble USB.</p>
     <div class="modeles">
@@ -254,7 +259,6 @@
     </div>
     <div class="actions-etape1">
       <button id="btnConnecter" class="gros-bouton">J'ai branché la liseuse</button>
-      <button class="bouton btnVoirLivres" type="button">📚 Voir les livres disponibles</button>
     </div>
     <div class="astuce">
       <span class="ico" aria-hidden="true">💡</span>

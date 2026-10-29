@@ -201,10 +201,16 @@ def construire_kepub(par_siecle):
         for l in livres:
             if est_bnr(l):
                 continue  # la BNR demande de diffuser ses fichiers sans modification
+            avant = set(dest.iterdir())
             r = subprocess.run([outil, "--output", str(dest), str(chemin_epub(l))],
                                capture_output=True, text=True)
+            # Selon la version, kepubify nomme le fichier « X.kepub.epub » ou « X_converted.kepub.epub »
+            nouveaux = [f for f in set(dest.iterdir()) - avant if f.name.endswith(".kepub.epub")]
+            if r.returncode == 0 and len(nouveaux) == 1 and nouveaux[0].name != nom_kepub(l):
+                nouveaux[0].rename(dest / nom_kepub(l))
             if r.returncode != 0 or not (dest / nom_kepub(l)).exists():
-                print(f"  KEPUB impossible pour {nom_fichier(l)} : {r.stderr.strip()[:200]}")
+                detail = (r.stderr or r.stdout).strip()[:200]
+                print(f"  KEPUB impossible pour {nom_fichier(l)} : {detail}")
 
 
 def construire_json(par_siecle):

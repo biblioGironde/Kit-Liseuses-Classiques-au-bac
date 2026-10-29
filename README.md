@@ -7,6 +7,7 @@ anticipées de français de **2020 à 2027**, et une webapp pour les copier en q
 clics sur les liseuses du réseau (Kobo, Cybook…).
 
 **Webapp :** https://bibliogironde.github.io/Kit-Liseuses-Classiques-au-bac/
+**Application de bureau (Windows, Mac, Linux, sans internet) :** [dernière version](https://github.com/biblioGironde/Kit-Liseuses-Classiques-au-bac/releases/latest)
 
 Ce dépôt complète le [Kit Les Classiques en numérique](https://github.com/biblioGironde/Kit-Les-Classiques-En-Numerique)
 et en reprend le fonctionnement.
@@ -76,6 +77,35 @@ déjà sont signalés et ne sont pas recopiés.
 - `opds.xml` : catalogue OPDS pour KOReader et les applis de lecture ;
 - `packs/` : un ZIP par objet d'étude et un ZIP complet.
 
+## Application de bureau (sans internet)
+
+La même webapp existe en application à installer, avec **tous les livres inclus** : pratique
+dans une bibliothèque sans connexion fiable, ou sur un ordinateur où Chrome et Edge ne sont pas
+installés. Elle se télécharge depuis la page
+[Releases](https://github.com/biblioGironde/Kit-Liseuses-Classiques-au-bac/releases/latest) :
+
+| Ordinateur | Fichier |
+|---|---|
+| Windows | `…-windows-installation.exe` (ou `…-windows-portable.exe`, sans installation, pour une clé USB) |
+| Mac (Intel et Apple Silicon) | `…-mac-universal.dmg` |
+| Linux | `…-linux-x86_64.AppImage` ou `…-linux-amd64.deb` |
+
+L'application n'est pas signée : au premier lancement, Windows affiche « Windows a protégé votre
+ordinateur » (cliquer sur *Informations complémentaires › Exécuter quand même*) et macOS peut
+demander une confirmation dans *Réglages Système › Confidentialité et sécurité › Ouvrir quand même*.
+
+**Publier une nouvelle version** (par exemple après la mise à jour du programme) : changer
+`version` dans `electron/package.json`, pousser, puis pousser une étiquette du même numéro :
+
+```bash
+git tag v1.1.0 && git push origin v1.1.0
+```
+
+L'action « Applications de bureau » construit les trois versions et les ajoute à la release.
+
+Tester l'application en local : `python3 scripts/construire.py && mv site electron/site`,
+puis `cd electron && npm install && npm start`.
+
 ## Organisation du dépôt
 
 ```
@@ -83,6 +113,7 @@ catalogue.csv          la liste des titres (à modifier pour ajouter un livre)
 epub/poesie, epub/idees, epub/roman, epub/theatre
                        les fichiers EPUB, rangés par objet d'étude
 app/index.html         la webapp
+electron/              l'application de bureau (Electron), qui embarque le site construit
 scripts/telecharger.py téléchargement en lot (BNR d'abord, puis Wikisource)
 scripts/construire.py  génère le site : webapp, catalogue.json, KEPUB, OPDS, ZIP
 SOURCES.md             provenance et licence de chaque titre (généré)

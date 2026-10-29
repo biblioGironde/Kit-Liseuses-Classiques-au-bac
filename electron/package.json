@@ -1,0 +1,48 @@
+{
+  "name": "kit-liseuses-classiques-au-bac",
+  "productName": "Bac de français",
+  "version": "1.0.0",
+  "description": "Copier sur une liseuse les œuvres libres de droits du programme du bac de français — biblio.gironde",
+  "author": { "name": "biblio.gironde", "email": "biblioGironde@users.noreply.github.com" },
+  "homepage": "https://github.com/biblioGironde/Kit-Liseuses-Classiques-au-bac",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "fr.gironde.biblio.bac-francais",
+    "productName": "Bac de français",
+    "artifactName": "Bac-de-francais-${version}-${os}-${arch}.${ext}",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["main.js", "package.json"],
+    "extraResources": [{ "from": "site", "to": "site" }],
+    "publish": [{ "provider": "github", "owner": "biblioGironde", "repo": "Kit-Liseuses-Classiques-au-bac", "releaseType": "release" }],
+    "mac": {
+      "category": "public.app-category.education",
+      "target": [{ "target": "dmg", "arch": ["universal"] }],
+      "identity": "-"
+    },
+    "dmg": { "title": "Bac de français" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }, { "target": "portable", "arch": ["x64"] }]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Bac de français",
+      "artifactName": "Bac-de-francais-${version}-windows-installation.${ext}"
+    },
+    "portable": { "artifactName": "Bac-de-francais-${version}-windows-portable.${ext}" },
+    "linux": {
+      "category": "Education",
+      "target": [{ "target": "AppImage", "arch": ["x64"] }, { "target": "deb", "arch": ["x64"] }],
+      "maintainer": "biblio.gironde <biblioGironde@users.noreply.github.com>"
+    }
+  }
+}

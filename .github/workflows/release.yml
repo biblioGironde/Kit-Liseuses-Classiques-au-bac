@@ -1,0 +1,84 @@
+name: Applications de bureau (release)
+
+# Crée une release GitHub avec l'application pour macOS, Windows et Linux.
+# Pour publier une nouvelle version : changer « version » dans electron/package.json,
+# puis pousser une étiquette du même numéro, par exemple :
+#   git tag v1.0.1 && git push origin v1.0.1
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  site:
+    name: Construire le site (livres, KEPUB, catalogue)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Installer kepubify (conversion au format Kobo)
+        run: |
+          curl -sSL -o /usr/local/bin/kepubify \
+            https://github.com/pgaskin/kepubify/releases/latest/download/kepubify-linux-64bit
+          chmod +x /usr/local/bin/kepubify
+      - run: python3 scripts/construire.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: site
+          include-hidden-files: true
+      - name: Créer la release (les trois systèmes y ajouteront leurs fichiers)
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" \
+            --title "Bac de français ${GITHUB_REF_NAME}" \
+            --notes-file .github/notes-release.md
+
+  application:
+    name: Application ${{ matrix.nom }}
+    needs: site
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-latest, nom: macOS, cible: --mac }
+          - { os: windows-latest, nom: Windows, cible: --win }
+          - { os: ubuntu-latest, nom: Linux, cible: --linux }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: electron
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: electron/site
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: electron/package-lock.json
+      - run: npm ci
+      - name: Construire et publier
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npx electron-builder ${{ matrix.cible }} --publish ${{ startsWith(github.ref, 'refs/tags/') && 'always' || 'never' }}
+      - name: Garder les fichiers (lancement manuel)
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-${{ matrix.nom }}
+          path: |
+            electron/dist/*.dmg
+            electron/dist/*.exe
+            electron/dist/*.AppImage
+            electron/dist/*.deb

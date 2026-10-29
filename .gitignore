@@ -1,3 +1,6 @@
 site/
 __pycache__/
 .DS_Store
+electron/node_modules/
+electron/site/
+electron/dist/

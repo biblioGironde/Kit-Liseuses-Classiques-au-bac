@@ -142,6 +142,10 @@
   .cat-puces button { border: 2px solid var(--ligne); background: var(--carte); border-radius: 999px; padding: 5px 14px;
     font-size: 15px; font-weight: 600; color: var(--encre); }
   .cat-puces button:hover { border-color: var(--encre); }
+  .cat-filtres { margin-top: 12px; }
+  .cat-libelle { display: block; font-size: 13px; font-weight: 700; color: var(--doux); text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: 6px; }
+  .cat-puces button.actif { background: var(--encre); border-color: var(--encre); color: var(--carte); }
   .cat-corps { overflow: auto; padding: 4px 26px 20px; }
   .cat-siecle h3 { font-size: 21px; margin: 20px 0 6px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
   .cat-siecle ul { list-style: none; margin: 0; padding: 0; }
@@ -215,7 +219,14 @@
     <div class="cat-entete" style="position:relative">
       <h2 id="catTitre">Les livres disponibles</h2>
       <p id="catResume"></p>
-      <div class="cat-puces" id="catPuces"></div>
+      <div class="cat-filtres">
+        <span class="cat-libelle">Genre</span>
+        <div class="cat-puces" id="catPuces"></div>
+      </div>
+      <div class="cat-filtres">
+        <span class="cat-libelle">Année du bac</span>
+        <div class="cat-puces" id="catAnnees"></div>
+      </div>
       <button class="cat-fermer" type="button" id="btnFermerCatalogue" aria-label="Fermer">×</button>
     </div>
     <div class="cat-corps" id="catCorps"></div>
@@ -342,7 +353,7 @@
 "use strict";
 const DOSSIER = "Bac de francais";
 const $ = (id) => document.getElementById(id);
-const etat = { catalogue: null, racine: null, modele: null, presents: new Set(), coches: new Set(), copieEnCours: false };
+const etat = { catalogue: null, anneeBac: null, racine: null, modele: null, presents: new Set(), coches: new Set(), copieEnCours: false };
 
 /* ---------- Utilitaires ---------- */
 const mo = (o) => o >= 1048576 ? (o / 1048576).toFixed(1).replace(".", ",") + " Mo" : Math.max(1, Math.round(o / 1024)) + " Ko";
@@ -444,19 +455,45 @@ function remplirCatalogue() {
   if (!c || !c.livres.length) {
     $("catResume").textContent = "";
     $("catPuces").innerHTML = "";
+    $("catAnnees").innerHTML = "";
     $("catCorps").innerHTML = '<p class="alerte">Le catalogue est en cours de constitution : revenez bientôt !</p>';
     return;
   }
   const siecles = Object.entries(c.siecles);
-  $("catResume").textContent = `${pluriel(c.livres.length, "livre")} libres de droits au programme du bac de français (épreuves 2020 à 2027).`;
-  $("catPuces").innerHTML = siecles.map(([s, lib]) =>
-    `<button type="button" data-aller="${s}">${echapper(lib.split(" —")[0])}</button>`).join("");
+  const annees = anneesBac(c.livres);
+  const a = etat.anneeBac;
+  const visibles = c.livres.filter((l) => auBac(l, a));
+  $("catResume").textContent = a
+    ? `${pluriel(visibles.length, "livre")} libres de droits au programme du bac de français ${a}.`
+    : `${pluriel(c.livres.length, "livre")} libres de droits au programme du bac de français (épreuves ${annees[0]} à ${annees[annees.length - 1]}).`;
+  $("catPuces").innerHTML = siecles
+    .filter(([s]) => visibles.some((l) => l.siecle === s))
+    .map(([s, lib]) => `<button type="button" data-aller="${s}">${echapper(lib.split(" —")[0])}</button>`).join("");
+  $("catAnnees").innerHTML = [["", "Toutes"], ...annees.map((n) => [String(n), String(n)])]
+    .map(([v, lib]) => `<button type="button" data-annee="${v}" class="${String(a || "") === v ? "actif" : ""}" aria-pressed="${String(a || "") === v}">${lib}</button>`).join("");
   $("catCorps").innerHTML = siecles.map(([s, lib]) => {
-    const liste = c.livres.filter((l) => l.siecle === s);
+    const liste = visibles.filter((l) => l.siecle === s);
+    if (!liste.length) return "";
     return `<section class="cat-siecle" id="cat-${s}"><h3>${echapper(lib)} <span class="a">· ${pluriel(liste.length, "livre")}</span></h3><ul>` +
       liste.map((l) => `<li><span><span class="t">${echapper(l.titre)}</span><br><span class="a">${echapper(l.auteur)}</span></span>` +
         `<span class="an">${echapper(l.annee)}</span></li>`).join("") + "</ul></section>";
   }).join("");
+}
+
+// Années de bac : « 2020-2023 » couvre 2020, 2021, 2022 et 2023
+function bornesBac(l) {
+  const m = String(l.bac || "").match(/(\d{4})(?:\s*-\s*(\d{4}))?/);
+  return m ? [Number(m[1]), Number(m[2] || m[1])] : null;
+}
+function auBac(l, annee) {
+  if (!annee) return true;
+  const b = bornesBac(l);
+  return !!b && b[0] <= annee && annee <= b[1];
+}
+function anneesBac(livres) {
+  const liste = new Set();
+  livres.forEach((l) => { const b = bornesBac(l); if (b) for (let n = b[0]; n <= b[1]; n++) liste.add(n); });
+  return [...liste].sort();
 }
 function ouvrirCatalogue() { remplirCatalogue(); $("catCorps").scrollTop = 0; ouvrirDialogue($("modalCatalogue")); }
 
@@ -723,6 +760,11 @@ document.querySelectorAll(".btnVoirLivres").forEach((b) => b.addEventListener("c
 $("btnFermerCatalogue").addEventListener("click", () => fermerDialogue($("modalCatalogue")));
 $("btnFermerCatalogue2").addEventListener("click", () => fermerDialogue($("modalCatalogue")));
 $("modalCatalogue").addEventListener("click", (e) => { if (e.target.id === "modalCatalogue") fermerDialogue(e.target); });
+$("catAnnees").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-annee]"); if (!b) return;
+  etat.anneeBac = b.dataset.annee ? Number(b.dataset.annee) : null;
+  remplirCatalogue(); $("catCorps").scrollTop = 0;
+});
 $("catPuces").addEventListener("click", (e) => {
   const s = e.target.dataset.aller; if (!s) return;
   const cible = $("cat-" + s);

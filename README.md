@@ -169,17 +169,11 @@ vérifiées titre par titre : [Ebooks libres et gratuits](https://www.ebooksgrat
 Elles ne sont pas hébergées dans le dépôt, mais `SOURCES.md` y renvoie, avec un lien de
 recherche [Gallica](https://gallica.bnf.fr) pour montrer les éditions anciennes en médiation.
 
-## Droits
+## Licences
 
-- Les œuvres sont dans le domaine public en France (auteurs morts depuis plus de 70 ans ;
-  Apollinaire, « mort pour la France », depuis 2013 ; Colette depuis 2025).
-- Elles ont toutes été publiées avant 1931 : elles sont aussi libres aux États-Unis, où
-  GitHub est hébergé.
-- Les EPUB de la **BNR** peuvent être utilisés librement, **sans modification**, en indiquant
-  la source ; ils sont diffusés tels quels.
-- Les EPUB issus de **Wikisource** sont sous licence CC BY-SA 4.0 : la source est indiquée
-  dans `SOURCES.md` et dans chaque fichier.
-- Ne pas ajouter de traduction ou de version modernisée récente : elle serait protégée.
+- **Code** (scripts et webapp) : © Département de la Gironde — biblio.gironde, sous licence [GNU Affero General Public License v3.0](LICENSE) ou ultérieure (AGPL-3.0-or-later). Vous pouvez le réutiliser et le modifier ; toute version modifiée, redistribuée ou mise en ligne, doit être publiée sous la même licence, avec son code source.
+- **Catalogue (`catalogue.csv`) et textes de présentation** : [Licence Ouverte Etalab 2.0](https://www.etalab.gouv.fr/licence-ouverte-open-licence/), réutilisation libre, y compris commerciale, avec mention de la source « biblio.gironde ».
+- **Livres EPUB** (`epub/`) : œuvres du domaine public, dans les éditions de la Bibliothèque numérique romande et de Wikisource. Ils ne sont pas couverts par ces licences : la licence de chaque source et la provenance de chaque titre sont dans [`SOURCES.md`](SOURCES.md).
 
 ## Activer GitHub Pages (une seule fois)
 
